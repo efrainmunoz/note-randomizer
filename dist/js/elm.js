@@ -9410,6 +9410,10 @@ var _user$project$Model$Note = F2(
 	function (a, b) {
 		return {name: a, accidental: b};
 	});
+var _user$project$Model$SavedSettings = F3(
+	function (a, b, c) {
+		return {randomBgColorOn: a, timerOn: b, timerInterval: c};
+	});
 var _user$project$Model$Model = F6(
 	function (a, b, c, d, e, f) {
 		return {note: a, bgColor: b, randomBgColorOn: c, timerOn: d, timerInterval: e, settingsOpen: f};
@@ -9426,6 +9430,10 @@ var _user$project$Model$defaultNote = A2(_user$project$Model$Note, _user$project
 var _user$project$Model$Sharp = {ctor: 'Sharp'};
 var _user$project$Model$Flat = {ctor: 'Flat'};
 
+var _user$project$Messages$ResponseSavedSettings = function (a) {
+	return {ctor: 'ResponseSavedSettings', _0: a};
+};
+var _user$project$Messages$RequestSavedSettings = {ctor: 'RequestSavedSettings'};
 var _user$project$Messages$TimerOption = function (a) {
 	return {ctor: 'TimerOption', _0: a};
 };
@@ -9566,6 +9574,47 @@ var _user$project$Commands$randomBgColorCmd = function (randomBgColorOn) {
 };
 var _user$project$Commands$randomNoteCmd = A2(_elm_lang$core$Random$generate, _user$project$Messages$NewNote, _user$project$Utilities$note);
 
+var _user$project$Ports$requestSavedSettings = _elm_lang$core$Native_Platform.outgoingPort(
+	'requestSavedSettings',
+	function (v) {
+		return null;
+	});
+var _user$project$Ports$requestSetRandomBgColor = _elm_lang$core$Native_Platform.outgoingPort(
+	'requestSetRandomBgColor',
+	function (v) {
+		return v;
+	});
+var _user$project$Ports$requestSetTimer = _elm_lang$core$Native_Platform.outgoingPort(
+	'requestSetTimer',
+	function (v) {
+		return v;
+	});
+var _user$project$Ports$requestSetTimerInterval = _elm_lang$core$Native_Platform.outgoingPort(
+	'requestSetTimerInterval',
+	function (v) {
+		return v;
+	});
+var _user$project$Ports$responseSavedSettings = _elm_lang$core$Native_Platform.incomingPort(
+	'responseSavedSettings',
+	A2(
+		_elm_lang$core$Json_Decode$andThen,
+		function (randomBgColorOn) {
+			return A2(
+				_elm_lang$core$Json_Decode$andThen,
+				function (timerOn) {
+					return A2(
+						_elm_lang$core$Json_Decode$andThen,
+						function (timerInterval) {
+							return _elm_lang$core$Json_Decode$succeed(
+								{randomBgColorOn: randomBgColorOn, timerOn: timerOn, timerInterval: timerInterval});
+						},
+						A2(_elm_lang$core$Json_Decode$field, 'timerInterval', _elm_lang$core$Json_Decode$float));
+				},
+				A2(_elm_lang$core$Json_Decode$field, 'timerOn', _elm_lang$core$Json_Decode$bool));
+		},
+		A2(_elm_lang$core$Json_Decode$field, 'randomBgColorOn', _elm_lang$core$Json_Decode$bool)));
+
+var _user$project$Subscriptions$responseSavedSettingsSub = _user$project$Ports$responseSavedSettings(_user$project$Messages$ResponseSavedSettings);
 var _user$project$Subscriptions$timerSub = function (model) {
 	var _p0 = model.timerOn;
 	if (_p0 === true) {
@@ -9582,7 +9631,11 @@ var _user$project$Subscriptions$subscriptions = function (model) {
 			_1: {
 				ctor: '::',
 				_0: _user$project$Subscriptions$timerSub(model),
-				_1: {ctor: '[]'}
+				_1: {
+					ctor: '::',
+					_0: _user$project$Subscriptions$responseSavedSettingsSub,
+					_1: {ctor: '[]'}
+				}
 			}
 		});
 };
@@ -9630,7 +9683,7 @@ var _user$project$Update$update = F2(
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
 						{randomBgColorOn: !model.randomBgColorOn}),
-					_1: _elm_lang$core$Platform_Cmd$none
+					_1: _user$project$Ports$requestSetRandomBgColor(!model.randomBgColorOn)
 				};
 			case 'RandomNote':
 				return {ctor: '_Tuple2', _0: model, _1: _user$project$Commands$randomNoteCmd};
@@ -9659,15 +9712,25 @@ var _user$project$Update$update = F2(
 				};
 			case 'Tick':
 				return {ctor: '_Tuple2', _0: model, _1: _user$project$Commands$randomNoteCmd};
-			default:
+			case 'TimerOption':
 				var _p3 = _elm_lang$core$String$toFloat(_p1._0);
 				if (_p3.ctor === 'Ok') {
+					var _p4 = _p3._0;
 					return {
 						ctor: '_Tuple2',
 						_0: _elm_lang$core$Native_Utils.update(
 							model,
-							{timerOn: true, timerInterval: _p3._0}),
-						_1: _elm_lang$core$Platform_Cmd$none
+							{timerOn: true, timerInterval: _p4}),
+						_1: _elm_lang$core$Platform_Cmd$batch(
+							{
+								ctor: '::',
+								_0: _user$project$Ports$requestSetTimer(true),
+								_1: {
+									ctor: '::',
+									_0: _user$project$Ports$requestSetTimerInterval(_p4),
+									_1: {ctor: '[]'}
+								}
+							})
 					};
 				} else {
 					return {
@@ -9675,9 +9738,25 @@ var _user$project$Update$update = F2(
 						_0: _elm_lang$core$Native_Utils.update(
 							model,
 							{timerOn: false}),
-						_1: _elm_lang$core$Platform_Cmd$none
+						_1: _user$project$Ports$requestSetTimer(false)
 					};
 				}
+			case 'RequestSavedSettings':
+				return {
+					ctor: '_Tuple2',
+					_0: model,
+					_1: _user$project$Ports$requestSavedSettings(
+						{ctor: '_Tuple0'})
+				};
+			default:
+				var _p5 = _p1._0;
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{randomBgColorOn: _p5.randomBgColorOn, timerOn: _p5.timerOn, timerInterval: _p5.timerInterval}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
 		}
 	});
 
@@ -10170,7 +10249,17 @@ var _user$project$View$view = function (model) {
 var _user$project$App$init = {
 	ctor: '_Tuple2',
 	_0: {note: _user$project$Model$defaultNote, bgColor: '#ee7b06', randomBgColorOn: true, settingsOpen: false, timerOn: false, timerInterval: _elm_lang$core$Time$second},
-	_1: _user$project$Commands$randomNoteCmd
+	_1: _elm_lang$core$Platform_Cmd$batch(
+		{
+			ctor: '::',
+			_0: _user$project$Ports$requestSavedSettings(
+				{ctor: '_Tuple0'}),
+			_1: {
+				ctor: '::',
+				_0: _user$project$Commands$randomNoteCmd,
+				_1: {ctor: '[]'}
+			}
+		})
 };
 var _user$project$App$main = _elm_lang$html$Html$program(
 	{init: _user$project$App$init, view: _user$project$View$view, update: _user$project$Update$update, subscriptions: _user$project$Subscriptions$subscriptions})();

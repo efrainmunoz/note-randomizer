@@ -3,6 +3,7 @@ module Messages exposing (..)
 import Model exposing (Note)
 import Keyboard
 import Time exposing (Time)
+import Model exposing (SavedSettings)
 
 
 type Msg
@@ -15,3 +16,5 @@ type Msg
     | CloseSettings
     | Tick Time
     | TimerOption String
+    | RequestSavedSettings
+    | ResponseSavedSettings SavedSettings

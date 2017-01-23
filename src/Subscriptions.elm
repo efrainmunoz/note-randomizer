@@ -4,6 +4,7 @@ import Messages exposing (Msg(..))
 import Model exposing (Model)
 import Keyboard
 import Time exposing (Time, every)
+import Ports
 
 
 subscriptions : Model -> Sub Msg
@@ -11,6 +12,7 @@ subscriptions model =
     Sub.batch
         [ Keyboard.downs KeyMsg
         , timerSub model
+        , responseSavedSettingsSub
         ]
 
 
@@ -26,3 +28,12 @@ timerSub model =
 
         False ->
             Sub.none
+
+
+
+-- PORTS
+
+
+responseSavedSettingsSub : Sub Msg
+responseSavedSettingsSub =
+    Ports.responseSavedSettings ResponseSavedSettings

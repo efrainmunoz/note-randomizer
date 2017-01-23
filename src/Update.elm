@@ -3,6 +3,7 @@ module Update exposing (..)
 import Commands exposing (randomNoteCmd, randomBgColorCmd)
 import Messages exposing (Msg(..))
 import Model exposing (Model, Note)
+import Ports
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -15,7 +16,9 @@ update msg model =
             newBgColorMsg newBgColor model
 
         BgColorOption ->
-            ( { model | randomBgColorOn = not model.randomBgColorOn }, Cmd.none )
+            ( { model | randomBgColorOn = not model.randomBgColorOn }
+            , Ports.requestSetRandomBgColor (not model.randomBgColorOn)
+            )
 
         RandomNote ->
             ( model, randomNoteCmd )
@@ -43,11 +46,26 @@ update msg model =
             case String.toFloat option of
                 Ok interval ->
                     ( { model | timerOn = True, timerInterval = interval }
-                    , Cmd.none
+                    , Cmd.batch
+                        [ Ports.requestSetTimer True
+                        , Ports.requestSetTimerInterval interval
+                        ]
                     )
 
                 Err off ->
-                    ( { model | timerOn = False }, Cmd.none )
+                    ( { model | timerOn = False }, Ports.requestSetTimer False )
+
+        RequestSavedSettings ->
+            ( model, Ports.requestSavedSettings () )
+
+        ResponseSavedSettings savedSettings ->
+            ( { model
+                | randomBgColorOn = savedSettings.randomBgColorOn
+                , timerOn = savedSettings.timerOn
+                , timerInterval = savedSettings.timerInterval
+              }
+            , Cmd.none
+            )
 
 
 

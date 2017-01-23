@@ -25,6 +25,13 @@ type alias Note =
     }
 
 
+type alias SavedSettings =
+    { randomBgColorOn : Bool
+    , timerOn : Bool
+    , timerInterval : Time
+    }
+
+
 type alias Model =
     { note : Note
     , bgColor : String

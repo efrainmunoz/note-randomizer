@@ -8,6 +8,7 @@ import Subscriptions exposing (subscriptions)
 import Update exposing (update)
 import View exposing (view)
 import Time exposing (second)
+import Ports
 
 
 main : Program Never Model Msg
@@ -33,5 +34,5 @@ init =
       , timerOn = False
       , timerInterval = second
       }
-    , randomNoteCmd
+    , Cmd.batch [ Ports.requestSavedSettings (), randomNoteCmd ]
     )

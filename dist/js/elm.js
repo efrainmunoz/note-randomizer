@@ -9410,9 +9410,9 @@ var _user$project$Model$Note = F2(
 	function (a, b) {
 		return {name: a, accidental: b};
 	});
-var _user$project$Model$Model = F4(
-	function (a, b, c, d) {
-		return {note: a, bgColor: b, randomBgColorOn: c, settingsOpen: d};
+var _user$project$Model$Model = F6(
+	function (a, b, c, d, e, f) {
+		return {note: a, bgColor: b, randomBgColorOn: c, timerOn: d, timerInterval: e, settingsOpen: f};
 	});
 var _user$project$Model$B = {ctor: 'B'};
 var _user$project$Model$A = {ctor: 'A'};
@@ -9426,6 +9426,12 @@ var _user$project$Model$defaultNote = A2(_user$project$Model$Note, _user$project
 var _user$project$Model$Sharp = {ctor: 'Sharp'};
 var _user$project$Model$Flat = {ctor: 'Flat'};
 
+var _user$project$Messages$TimerOption = function (a) {
+	return {ctor: 'TimerOption', _0: a};
+};
+var _user$project$Messages$Tick = function (a) {
+	return {ctor: 'Tick', _0: a};
+};
 var _user$project$Messages$CloseSettings = {ctor: 'CloseSettings'};
 var _user$project$Messages$OpenSettings = {ctor: 'OpenSettings'};
 var _user$project$Messages$KeyMsg = function (a) {
@@ -9440,6 +9446,22 @@ var _user$project$Messages$NewNote = function (a) {
 	return {ctor: 'NewNote', _0: a};
 };
 
+var _user$project$Utilities$onChange = function (tagger) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'change',
+		A2(_elm_lang$core$Json_Decode$map, tagger, _elm_lang$html$Html_Events$targetValue));
+};
+var _user$project$Utilities$selectedTimer = F2(
+	function (optionValue, model) {
+		var _p0 = model.timerOn;
+		if (_p0 === true) {
+			var modelValue = _elm_lang$core$Basics$toString(model.timerInterval);
+			return _elm_lang$core$Native_Utils.eq(optionValue, modelValue);
+		} else {
+			return _elm_lang$core$Native_Utils.eq(optionValue, 'OFF') ? true : false;
+		}
+	});
 var _user$project$Utilities$bgColors = _elm_lang$core$Array$fromList(
 	{
 		ctor: '::',
@@ -9472,9 +9494,9 @@ var _user$project$Utilities$bgColors = _elm_lang$core$Array$fromList(
 	});
 var _user$project$Utilities$getBgColor = function ($int) {
 	var color = A2(_elm_lang$core$Array$get, $int, _user$project$Utilities$bgColors);
-	var _p0 = color;
-	if (_p0.ctor === 'Just') {
-		return _p0._0;
+	var _p1 = color;
+	if (_p1.ctor === 'Just') {
+		return _p1._0;
 	} else {
 		return '#1d9dbd';
 	}
@@ -9484,8 +9506,8 @@ var _user$project$Utilities$bgColor = A2(
 	_user$project$Utilities$getBgColor,
 	A2(_elm_lang$core$Random$int, 0, 6));
 var _user$project$Utilities$nameMapping = function ($int) {
-	var _p1 = $int;
-	switch (_p1) {
+	var _p2 = $int;
+	switch (_p2) {
 		case 1:
 			return _user$project$Model$C;
 		case 2:
@@ -9507,8 +9529,8 @@ var _user$project$Utilities$name = A2(
 	_user$project$Utilities$nameMapping,
 	A2(_elm_lang$core$Random$int, 1, 7));
 var _user$project$Utilities$accidentalMapping = function ($int) {
-	var _p2 = $int;
-	switch (_p2) {
+	var _p3 = $int;
+	switch (_p3) {
 		case 1:
 			return _user$project$Model$Flat;
 		case 2:
@@ -9523,8 +9545,8 @@ var _user$project$Utilities$accidental = A2(
 	A2(_elm_lang$core$Random$int, 1, 3));
 var _user$project$Utilities$note = A3(_elm_lang$core$Random$map2, _user$project$Model$Note, _user$project$Utilities$name, _user$project$Utilities$accidental);
 var _user$project$Utilities$accidentalSymbol = function (accidental) {
-	var _p3 = accidental;
-	switch (_p3.ctor) {
+	var _p4 = accidental;
+	switch (_p4.ctor) {
 		case 'Flat':
 			return 'b';
 		case 'Sharp':
@@ -9544,8 +9566,25 @@ var _user$project$Commands$randomBgColorCmd = function (randomBgColorOn) {
 };
 var _user$project$Commands$randomNoteCmd = A2(_elm_lang$core$Random$generate, _user$project$Messages$NewNote, _user$project$Utilities$note);
 
+var _user$project$Subscriptions$timerSub = function (model) {
+	var _p0 = model.timerOn;
+	if (_p0 === true) {
+		return A2(_elm_lang$core$Time$every, model.timerInterval, _user$project$Messages$Tick);
+	} else {
+		return _elm_lang$core$Platform_Sub$none;
+	}
+};
 var _user$project$Subscriptions$subscriptions = function (model) {
-	return _elm_lang$keyboard$Keyboard$downs(_user$project$Messages$KeyMsg);
+	return _elm_lang$core$Platform_Sub$batch(
+		{
+			ctor: '::',
+			_0: _elm_lang$keyboard$Keyboard$downs(_user$project$Messages$KeyMsg),
+			_1: {
+				ctor: '::',
+				_0: _user$project$Subscriptions$timerSub(model),
+				_1: {ctor: '[]'}
+			}
+		});
 };
 
 var _user$project$Update$newBgColorMsg = F2(
@@ -9610,7 +9649,7 @@ var _user$project$Update$update = F2(
 						{settingsOpen: true}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
-			default:
+			case 'CloseSettings':
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
@@ -9618,9 +9657,215 @@ var _user$project$Update$update = F2(
 						{settingsOpen: false}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
+			case 'Tick':
+				return {ctor: '_Tuple2', _0: model, _1: _user$project$Commands$randomNoteCmd};
+			default:
+				var _p3 = _elm_lang$core$String$toFloat(_p1._0);
+				if (_p3.ctor === 'Ok') {
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							model,
+							{timerOn: true, timerInterval: _p3._0}),
+						_1: _elm_lang$core$Platform_Cmd$none
+					};
+				} else {
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							model,
+							{timerOn: false}),
+						_1: _elm_lang$core$Platform_Cmd$none
+					};
+				}
 		}
 	});
 
+var _user$project$View$settingsTimer = function (model) {
+	return A2(
+		_elm_lang$html$Html$div,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('settings-timer'),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html$text('Timer:'),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$select,
+					{
+						ctor: '::',
+						_0: _user$project$Utilities$onChange(_user$project$Messages$TimerOption),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$option,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$value('OFF'),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$selected(
+										A2(_user$project$Utilities$selectedTimer, 'OFF', model)),
+									_1: {ctor: '[]'}
+								}
+							},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text('OFF'),
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$option,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$value('1000'),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$selected(
+											A2(_user$project$Utilities$selectedTimer, '1000', model)),
+										_1: {ctor: '[]'}
+									}
+								},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text('1 Second'),
+									_1: {ctor: '[]'}
+								}),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$option,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$value('2000'),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$selected(
+												A2(_user$project$Utilities$selectedTimer, '2000', model)),
+											_1: {ctor: '[]'}
+										}
+									},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text('2 Seconds'),
+										_1: {ctor: '[]'}
+									}),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$option,
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$value('4000'),
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$selected(
+													A2(_user$project$Utilities$selectedTimer, '4000', model)),
+												_1: {ctor: '[]'}
+											}
+										},
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html$text('4 Seconds'),
+											_1: {ctor: '[]'}
+										}),
+									_1: {
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$option,
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$value('8000'),
+												_1: {
+													ctor: '::',
+													_0: _elm_lang$html$Html_Attributes$selected(
+														A2(_user$project$Utilities$selectedTimer, '8000', model)),
+													_1: {ctor: '[]'}
+												}
+											},
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html$text('8 Seconds'),
+												_1: {ctor: '[]'}
+											}),
+										_1: {
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html$option,
+												{
+													ctor: '::',
+													_0: _elm_lang$html$Html_Attributes$value('16000'),
+													_1: {
+														ctor: '::',
+														_0: _elm_lang$html$Html_Attributes$selected(
+															A2(_user$project$Utilities$selectedTimer, '16000', model)),
+														_1: {ctor: '[]'}
+													}
+												},
+												{
+													ctor: '::',
+													_0: _elm_lang$html$Html$text('16 Seconds'),
+													_1: {ctor: '[]'}
+												}),
+											_1: {
+												ctor: '::',
+												_0: A2(
+													_elm_lang$html$Html$option,
+													{
+														ctor: '::',
+														_0: _elm_lang$html$Html_Attributes$value('32000'),
+														_1: {
+															ctor: '::',
+															_0: _elm_lang$html$Html_Attributes$selected(
+																A2(_user$project$Utilities$selectedTimer, '32000', model)),
+															_1: {ctor: '[]'}
+														}
+													},
+													{
+														ctor: '::',
+														_0: _elm_lang$html$Html$text('32 Seconds'),
+														_1: {ctor: '[]'}
+													}),
+												_1: {
+													ctor: '::',
+													_0: A2(
+														_elm_lang$html$Html$option,
+														{
+															ctor: '::',
+															_0: _elm_lang$html$Html_Attributes$value('64000'),
+															_1: {
+																ctor: '::',
+																_0: _elm_lang$html$Html_Attributes$selected(
+																	A2(_user$project$Utilities$selectedTimer, '64000', model)),
+																_1: {ctor: '[]'}
+															}
+														},
+														{
+															ctor: '::',
+															_0: _elm_lang$html$Html$text('64 Seconds'),
+															_1: {ctor: '[]'}
+														}),
+													_1: {ctor: '[]'}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}),
+				_1: {ctor: '[]'}
+			}
+		});
+};
 var _user$project$View$settingsBgColor = function (option) {
 	return A2(
 		_elm_lang$html$Html$div,
@@ -9742,7 +9987,11 @@ var _user$project$View$settingsModal = function (model) {
 				_1: {
 					ctor: '::',
 					_0: _user$project$View$settingsBgColor(model.randomBgColorOn),
-					_1: {ctor: '[]'}
+					_1: {
+						ctor: '::',
+						_0: _user$project$View$settingsTimer(model),
+						_1: {ctor: '[]'}
+					}
 				}
 			}
 		}) : A2(
@@ -9920,7 +10169,7 @@ var _user$project$View$view = function (model) {
 
 var _user$project$App$init = {
 	ctor: '_Tuple2',
-	_0: {note: _user$project$Model$defaultNote, bgColor: '#ee7b06', randomBgColorOn: true, settingsOpen: false},
+	_0: {note: _user$project$Model$defaultNote, bgColor: '#ee7b06', randomBgColorOn: true, settingsOpen: false, timerOn: false, timerInterval: _elm_lang$core$Time$second},
 	_1: _user$project$Commands$randomNoteCmd
 };
 var _user$project$App$main = _elm_lang$html$Html$program(

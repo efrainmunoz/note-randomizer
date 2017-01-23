@@ -36,6 +36,19 @@ update msg model =
         CloseSettings ->
             ( { model | settingsOpen = False }, Cmd.none )
 
+        Tick time ->
+            ( model, randomNoteCmd )
+
+        TimerOption option ->
+            case String.toFloat option of
+                Ok interval ->
+                    ( { model | timerOn = True, timerInterval = interval }
+                    , Cmd.none
+                    )
+
+                Err off ->
+                    ( { model | timerOn = False }, Cmd.none )
+
 
 
 -- NewNote Message

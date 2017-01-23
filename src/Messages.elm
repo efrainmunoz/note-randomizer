@@ -2,6 +2,7 @@ module Messages exposing (..)
 
 import Model exposing (Note)
 import Keyboard
+import Time exposing (Time)
 
 
 type Msg
@@ -12,3 +13,5 @@ type Msg
     | KeyMsg Keyboard.KeyCode
     | OpenSettings
     | CloseSettings
+    | Tick Time
+    | TimerOption String

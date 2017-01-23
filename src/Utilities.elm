@@ -1,7 +1,17 @@
-module Utilities exposing (accidentalSymbol, note, bgColor)
+module Utilities
+    exposing
+        ( accidentalSymbol
+        , note
+        , bgColor
+        , onChange
+        , selectedTimer
+        )
 
 import Array exposing (Array)
-import Model exposing (Accidental(..), Name(..), Note)
+import Model exposing (Model, Accidental(..), Name(..), Note)
+import Json.Decode as Decode
+import Html exposing (Attribute)
+import Html.Events exposing (on, targetValue)
 import Random
 
 
@@ -108,3 +118,33 @@ getBgColor int =
 
             Nothing ->
                 "#1d9dbd"
+
+
+
+-- TIMER
+
+
+selectedTimer : String -> Model -> Bool
+selectedTimer optionValue model =
+    case model.timerOn of
+        True ->
+            let
+                modelValue =
+                    toString model.timerInterval
+            in
+                optionValue == modelValue
+
+        False ->
+            if optionValue == "OFF" then
+                True
+            else
+                False
+
+
+
+-- ON SELECT CHANGE
+
+
+onChange : (String -> msg) -> Attribute msg
+onChange tagger =
+    on "change" (Decode.map tagger targetValue)

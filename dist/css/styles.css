@@ -115,6 +115,19 @@ html, body {
   font-size: 1.1em;
 }
 
+.settings-timer {
+  display: flex;
+  flex-direction: row;
+  margin-top: 16px;
+  margin-left: auto;
+  margin-right: auto;
+  font-size: 1.5em;
+}
+
+.settings-timer select {
+  margin-left: 16px;
+}
+
 .footer {
   margin-left: 16px;
   margin-right: 16px;

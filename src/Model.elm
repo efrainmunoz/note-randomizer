@@ -1,5 +1,7 @@
 module Model exposing (..)
 
+import Time exposing (Time)
+
 
 type Name
     = C
@@ -27,6 +29,8 @@ type alias Model =
     { note : Note
     , bgColor : String
     , randomBgColorOn : Bool
+    , timerOn : Bool
+    , timerInterval : Time
     , settingsOpen : Bool
     }
 

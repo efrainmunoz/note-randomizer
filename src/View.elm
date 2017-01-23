@@ -1,11 +1,11 @@
 module View exposing (..)
 
-import Html exposing (Html, div, hr, span, text, input)
-import Html.Attributes exposing (class, style, type_, checked)
+import Html exposing (Html, div, hr, span, text, input, option, select)
+import Html.Attributes exposing (class, style, type_, checked, value, selected)
 import Html.Events exposing (onClick, onCheck)
 import Messages exposing (Msg(..))
 import Model exposing (Model)
-import Utilities exposing (accidentalSymbol)
+import Utilities exposing (accidentalSymbol, onChange, selectedTimer)
 
 
 view : Model -> Html Msg
@@ -82,6 +82,7 @@ settingsModal model =
             [ settingsHeader
             , hr [ class "settings-hr" ] []
             , settingsBgColor model.randomBgColorOn
+            , settingsTimer model
             ]
     else
         div [] []
@@ -112,4 +113,29 @@ settingsBgColor option =
 
             False ->
                 span [ class "fa fa-square-o", onClick BgColorOption ] []
+        ]
+
+
+settingsTimer : Model -> Html Msg
+settingsTimer model =
+    div [ class "settings-timer" ]
+        [ text "Timer:"
+        , select [ onChange TimerOption ]
+            [ option [ value "OFF", selected (selectedTimer "OFF" model) ]
+                [ text "OFF" ]
+            , option [ value "1000", selected (selectedTimer "1000" model) ]
+                [ text "1 Second" ]
+            , option [ value "2000", selected (selectedTimer "2000" model) ]
+                [ text "2 Seconds" ]
+            , option [ value "4000", selected (selectedTimer "4000" model) ]
+                [ text "4 Seconds" ]
+            , option [ value "8000", selected (selectedTimer "8000" model) ]
+                [ text "8 Seconds" ]
+            , option [ value "16000", selected (selectedTimer "16000" model) ]
+                [ text "16 Seconds" ]
+            , option [ value "32000", selected (selectedTimer "32000" model) ]
+                [ text "32 Seconds" ]
+            , option [ value "64000", selected (selectedTimer "64000" model) ]
+                [ text "64 Seconds" ]
+            ]
         ]

@@ -7,6 +7,7 @@ import Model exposing (Model, defaultNote)
 import Subscriptions exposing (subscriptions)
 import Update exposing (update)
 import View exposing (view)
+import Time exposing (second)
 
 
 main : Program Never Model Msg
@@ -29,6 +30,8 @@ init =
       , bgColor = "#ee7b06"
       , randomBgColorOn = True
       , settingsOpen = False
+      , timerOn = False
+      , timerInterval = second
       }
     , randomNoteCmd
     )

@@ -8,4 +8,7 @@ type Msg
     = NewNote Note
     | RandomNote
     | NewBgColor String
+    | BgColorOption
     | KeyMsg Keyboard.KeyCode
+    | OpenSettings
+    | CloseSettings

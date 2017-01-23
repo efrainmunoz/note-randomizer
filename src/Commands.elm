@@ -10,6 +10,11 @@ randomNoteCmd =
     Random.generate NewNote note
 
 
-randomBgColorCmd : Cmd Msg
-randomBgColorCmd =
-    Random.generate NewBgColor bgColor
+randomBgColorCmd : Bool -> Cmd Msg
+randomBgColorCmd randomBgColorOn =
+    case randomBgColorOn of
+        True ->
+            Random.generate NewBgColor bgColor
+
+        False ->
+            Cmd.none

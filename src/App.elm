@@ -26,7 +26,9 @@ main =
 init : ( Model, Cmd Msg )
 init =
     ( { note = defaultNote
-      , bgColor = ""
+      , bgColor = "#ee7b06"
+      , randomBgColorOn = True
+      , settingsOpen = False
       }
-    , Cmd.batch [ randomNoteCmd, randomBgColorCmd ]
+    , randomNoteCmd
     )

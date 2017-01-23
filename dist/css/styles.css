@@ -59,10 +59,60 @@ html, body {
   margin-left: 16px;
 }
 
-.settings {
+.settings-icon {
   font-size: 1.5em;
   margin-top: 4px;
   margin-right: 16px;
+}
+
+.settings-header {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.settings-hr {
+  width: 99%;
+}
+
+.settings-title {
+  font-size: 1.5em;
+  margin-top: 16px;
+  margin-left: 26px;
+}
+
+.settings-close-icon {
+  font-size: 1.5em;
+  margin-top: 10px;
+  margin-right: 26px;
+  text-align: right;
+}
+
+.settings-modal {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  left: 8px;
+  top: 8px;
+  right: 8px;
+  bottom: 8px;
+	background-color: rgba(90, 90, 90, 0.95);
+  border-radius: 12px;
+}
+
+.settings-bgcolor {
+  display: flex;
+  flex-direction: row;
+  margin-top: 16px;
+  margin-left: auto;
+  margin-right: auto;
+  font-size: 1.5em;
+}
+
+.settings-bgcolor span {
+  margin-left: 16px;
+  font-size: 1.1em;
 }
 
 .footer {

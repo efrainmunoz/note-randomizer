@@ -1,8 +1,8 @@
 module View exposing (..)
 
-import Html exposing (Html, div, span, text)
-import Html.Attributes exposing (class, style)
-import Html.Events exposing (onClick)
+import Html exposing (Html, div, hr, span, text, input)
+import Html.Attributes exposing (class, style, type_, checked)
+import Html.Events exposing (onClick, onCheck)
 import Messages exposing (Msg(..))
 import Model exposing (Model)
 import Utilities exposing (accidentalSymbol)
@@ -14,6 +14,7 @@ view model =
         [ nav
         , mainArea model
         , footer
+        , settingsModal model
         ]
 
 
@@ -25,7 +26,7 @@ nav : Html Msg
 nav =
     div [ class "nav flex-row" ]
         [ logo
-        , settings
+        , settingsIcon
         ]
 
 
@@ -34,9 +35,9 @@ logo =
     div [ class "logo" ] [ text "NOTE RANDOMIZER" ]
 
 
-settings : Html Msg
-settings =
-    div [ class "settings" ]
+settingsIcon : Html Msg
+settingsIcon =
+    div [ class "settings-icon", onClick OpenSettings ]
         [ span [ class "fa fa-cog" ] [] ]
 
 
@@ -68,3 +69,47 @@ footer =
 instructions : Html Msg
 instructions =
     div [ class "instructions" ] [ text "Tap the Spacebar" ]
+
+
+
+-- SETTINGS
+
+
+settingsModal : Model -> Html Msg
+settingsModal model =
+    if model.settingsOpen then
+        div [ class "settings-modal" ]
+            [ settingsHeader
+            , hr [ class "settings-hr" ] []
+            , settingsBgColor model.randomBgColorOn
+            ]
+    else
+        div [] []
+
+
+settingsHeader : Html Msg
+settingsHeader =
+    div [ class "settings-header" ]
+        [ div [ class "settings-title" ] [ text "SETTINGS" ]
+        , settingsCloseIcon
+        ]
+
+
+settingsCloseIcon : Html Msg
+settingsCloseIcon =
+    div [ class "settings-close-icon", onClick CloseSettings ]
+        [ span [ class "fa fa-times" ] []
+        ]
+
+
+settingsBgColor : Bool -> Html Msg
+settingsBgColor option =
+    div [ class "settings-bgcolor" ]
+        [ text "Random Color:"
+        , case option of
+            True ->
+                span [ class "fa fa-check-square-o", onClick BgColorOption ] []
+
+            False ->
+                span [ class "fa fa-square-o", onClick BgColorOption ] []
+        ]

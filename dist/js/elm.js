@@ -9410,9 +9410,9 @@ var _user$project$Model$Note = F2(
 	function (a, b) {
 		return {name: a, accidental: b};
 	});
-var _user$project$Model$Model = F2(
-	function (a, b) {
-		return {note: a, bgColor: b};
+var _user$project$Model$Model = F4(
+	function (a, b, c, d) {
+		return {note: a, bgColor: b, randomBgColorOn: c, settingsOpen: d};
 	});
 var _user$project$Model$B = {ctor: 'B'};
 var _user$project$Model$A = {ctor: 'A'};
@@ -9426,9 +9426,12 @@ var _user$project$Model$defaultNote = A2(_user$project$Model$Note, _user$project
 var _user$project$Model$Sharp = {ctor: 'Sharp'};
 var _user$project$Model$Flat = {ctor: 'Flat'};
 
+var _user$project$Messages$CloseSettings = {ctor: 'CloseSettings'};
+var _user$project$Messages$OpenSettings = {ctor: 'OpenSettings'};
 var _user$project$Messages$KeyMsg = function (a) {
 	return {ctor: 'KeyMsg', _0: a};
 };
+var _user$project$Messages$BgColorOption = {ctor: 'BgColorOption'};
 var _user$project$Messages$NewBgColor = function (a) {
 	return {ctor: 'NewBgColor', _0: a};
 };
@@ -9531,73 +9534,222 @@ var _user$project$Utilities$accidentalSymbol = function (accidental) {
 	}
 };
 
-var _user$project$Commands$randomBgColorCmd = A2(_elm_lang$core$Random$generate, _user$project$Messages$NewBgColor, _user$project$Utilities$bgColor);
+var _user$project$Commands$randomBgColorCmd = function (randomBgColorOn) {
+	var _p0 = randomBgColorOn;
+	if (_p0 === true) {
+		return A2(_elm_lang$core$Random$generate, _user$project$Messages$NewBgColor, _user$project$Utilities$bgColor);
+	} else {
+		return _elm_lang$core$Platform_Cmd$none;
+	}
+};
 var _user$project$Commands$randomNoteCmd = A2(_elm_lang$core$Random$generate, _user$project$Messages$NewNote, _user$project$Utilities$note);
 
 var _user$project$Subscriptions$subscriptions = function (model) {
 	return _elm_lang$keyboard$Keyboard$downs(_user$project$Messages$KeyMsg);
 };
 
+var _user$project$Update$newBgColorMsg = F2(
+	function (newBgColor, model) {
+		var _p0 = model.randomBgColorOn;
+		if (_p0 === true) {
+			return _elm_lang$core$Native_Utils.eq(newBgColor, model.bgColor) ? {
+				ctor: '_Tuple2',
+				_0: model,
+				_1: _user$project$Commands$randomBgColorCmd(true)
+			} : {
+				ctor: '_Tuple2',
+				_0: _elm_lang$core$Native_Utils.update(
+					model,
+					{bgColor: newBgColor}),
+				_1: _elm_lang$core$Platform_Cmd$none
+			};
+		} else {
+			return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+		}
+	});
+var _user$project$Update$newNoteMsg = F2(
+	function (newNote, model) {
+		return _elm_lang$core$Native_Utils.eq(newNote, model.note) ? {ctor: '_Tuple2', _0: model, _1: _user$project$Commands$randomNoteCmd} : {
+			ctor: '_Tuple2',
+			_0: _elm_lang$core$Native_Utils.update(
+				model,
+				{note: newNote}),
+			_1: _user$project$Commands$randomBgColorCmd(model.randomBgColorOn)
+		};
+	});
 var _user$project$Update$update = F2(
 	function (msg, model) {
-		var _p0 = msg;
-		switch (_p0.ctor) {
+		var _p1 = msg;
+		switch (_p1.ctor) {
 			case 'NewNote':
-				var _p1 = _p0._0;
-				return _elm_lang$core$Native_Utils.eq(_p1, model.note) ? {ctor: '_Tuple2', _0: model, _1: _user$project$Commands$randomNoteCmd} : {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{note: _p1}),
-					_1: _elm_lang$core$Platform_Cmd$none
-				};
+				return A2(_user$project$Update$newNoteMsg, _p1._0, model);
 			case 'NewBgColor':
-				var _p2 = _p0._0;
-				return _elm_lang$core$Native_Utils.eq(_p2, model.bgColor) ? {ctor: '_Tuple2', _0: model, _1: _user$project$Commands$randomBgColorCmd} : {
+				return A2(_user$project$Update$newBgColorMsg, _p1._0, model);
+			case 'BgColorOption':
+				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{bgColor: _p2}),
+						{randomBgColorOn: !model.randomBgColorOn}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'RandomNote':
-				return {
-					ctor: '_Tuple2',
-					_0: model,
-					_1: _elm_lang$core$Platform_Cmd$batch(
-						{
-							ctor: '::',
-							_0: _user$project$Commands$randomNoteCmd,
-							_1: {
-								ctor: '::',
-								_0: _user$project$Commands$randomBgColorCmd,
-								_1: {ctor: '[]'}
-							}
-						})
-				};
-			default:
-				var _p3 = _p0._0;
-				if (_p3 === 32) {
-					return {
-						ctor: '_Tuple2',
-						_0: model,
-						_1: _elm_lang$core$Platform_Cmd$batch(
-							{
-								ctor: '::',
-								_0: _user$project$Commands$randomNoteCmd,
-								_1: {
-									ctor: '::',
-									_0: _user$project$Commands$randomBgColorCmd,
-									_1: {ctor: '[]'}
-								}
-							})
-					};
+				return {ctor: '_Tuple2', _0: model, _1: _user$project$Commands$randomNoteCmd};
+			case 'KeyMsg':
+				var _p2 = _p1._0;
+				if (_p2 === 32) {
+					return {ctor: '_Tuple2', _0: model, _1: _user$project$Commands$randomNoteCmd};
 				} else {
 					return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 				}
+			case 'OpenSettings':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{settingsOpen: true}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			default:
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{settingsOpen: false}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
 		}
 	});
 
+var _user$project$View$settingsBgColor = function (option) {
+	return A2(
+		_elm_lang$html$Html$div,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('settings-bgcolor'),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html$text('Random Color:'),
+			_1: {
+				ctor: '::',
+				_0: function () {
+					var _p0 = option;
+					if (_p0 === true) {
+						return A2(
+							_elm_lang$html$Html$span,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('fa fa-check-square-o'),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Events$onClick(_user$project$Messages$BgColorOption),
+									_1: {ctor: '[]'}
+								}
+							},
+							{ctor: '[]'});
+					} else {
+						return A2(
+							_elm_lang$html$Html$span,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('fa fa-square-o'),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Events$onClick(_user$project$Messages$BgColorOption),
+									_1: {ctor: '[]'}
+								}
+							},
+							{ctor: '[]'});
+					}
+				}(),
+				_1: {ctor: '[]'}
+			}
+		});
+};
+var _user$project$View$settingsCloseIcon = A2(
+	_elm_lang$html$Html$div,
+	{
+		ctor: '::',
+		_0: _elm_lang$html$Html_Attributes$class('settings-close-icon'),
+		_1: {
+			ctor: '::',
+			_0: _elm_lang$html$Html_Events$onClick(_user$project$Messages$CloseSettings),
+			_1: {ctor: '[]'}
+		}
+	},
+	{
+		ctor: '::',
+		_0: A2(
+			_elm_lang$html$Html$span,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('fa fa-times'),
+				_1: {ctor: '[]'}
+			},
+			{ctor: '[]'}),
+		_1: {ctor: '[]'}
+	});
+var _user$project$View$settingsHeader = A2(
+	_elm_lang$html$Html$div,
+	{
+		ctor: '::',
+		_0: _elm_lang$html$Html_Attributes$class('settings-header'),
+		_1: {ctor: '[]'}
+	},
+	{
+		ctor: '::',
+		_0: A2(
+			_elm_lang$html$Html$div,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('settings-title'),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text('SETTINGS'),
+				_1: {ctor: '[]'}
+			}),
+		_1: {
+			ctor: '::',
+			_0: _user$project$View$settingsCloseIcon,
+			_1: {ctor: '[]'}
+		}
+	});
+var _user$project$View$settingsModal = function (model) {
+	return model.settingsOpen ? A2(
+		_elm_lang$html$Html$div,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('settings-modal'),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: _user$project$View$settingsHeader,
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$hr,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('settings-hr'),
+						_1: {ctor: '[]'}
+					},
+					{ctor: '[]'}),
+				_1: {
+					ctor: '::',
+					_0: _user$project$View$settingsBgColor(model.randomBgColorOn),
+					_1: {ctor: '[]'}
+				}
+			}
+		}) : A2(
+		_elm_lang$html$Html$div,
+		{ctor: '[]'},
+		{ctor: '[]'});
+};
 var _user$project$View$instructions = A2(
 	_elm_lang$html$Html$div,
 	{
@@ -9679,12 +9831,16 @@ var _user$project$View$mainArea = function (model) {
 			_1: {ctor: '[]'}
 		});
 };
-var _user$project$View$settings = A2(
+var _user$project$View$settingsIcon = A2(
 	_elm_lang$html$Html$div,
 	{
 		ctor: '::',
-		_0: _elm_lang$html$Html_Attributes$class('settings'),
-		_1: {ctor: '[]'}
+		_0: _elm_lang$html$Html_Attributes$class('settings-icon'),
+		_1: {
+			ctor: '::',
+			_0: _elm_lang$html$Html_Events$onClick(_user$project$Messages$OpenSettings),
+			_1: {ctor: '[]'}
+		}
 	},
 	{
 		ctor: '::',
@@ -9722,7 +9878,7 @@ var _user$project$View$nav = A2(
 		_0: _user$project$View$logo,
 		_1: {
 			ctor: '::',
-			_0: _user$project$View$settings,
+			_0: _user$project$View$settingsIcon,
 			_1: {ctor: '[]'}
 		}
 	});
@@ -9752,7 +9908,11 @@ var _user$project$View$view = function (model) {
 				_1: {
 					ctor: '::',
 					_0: _user$project$View$footer,
-					_1: {ctor: '[]'}
+					_1: {
+						ctor: '::',
+						_0: _user$project$View$settingsModal(model),
+						_1: {ctor: '[]'}
+					}
 				}
 			}
 		});
@@ -9760,17 +9920,8 @@ var _user$project$View$view = function (model) {
 
 var _user$project$App$init = {
 	ctor: '_Tuple2',
-	_0: {note: _user$project$Model$defaultNote, bgColor: ''},
-	_1: _elm_lang$core$Platform_Cmd$batch(
-		{
-			ctor: '::',
-			_0: _user$project$Commands$randomNoteCmd,
-			_1: {
-				ctor: '::',
-				_0: _user$project$Commands$randomBgColorCmd,
-				_1: {ctor: '[]'}
-			}
-		})
+	_0: {note: _user$project$Model$defaultNote, bgColor: '#ee7b06', randomBgColorOn: true, settingsOpen: false},
+	_1: _user$project$Commands$randomNoteCmd
 };
 var _user$project$App$main = _elm_lang$html$Html$program(
 	{init: _user$project$App$init, view: _user$project$View$view, update: _user$project$Update$update, subscriptions: _user$project$Subscriptions$subscriptions})();

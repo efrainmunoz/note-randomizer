@@ -26,6 +26,8 @@ type alias Note =
 type alias Model =
     { note : Note
     , bgColor : String
+    , randomBgColorOn : Bool
+    , settingsOpen : Bool
     }
 
 
